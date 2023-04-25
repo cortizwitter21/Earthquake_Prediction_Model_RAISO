@@ -1,4 +1,36 @@
 import numpy as np
 import pandas as pd 
-print("Hello World")
+import matplotlib.pyplot as plt
 
+# using pandas library read dataset 
+
+
+# print out dataset and choose columns to use from dataset 
+
+
+# convert dataset into a numpy array
+
+
+# using sklearn model train test split the dataset
+# setting an X and Y variable based on the dataset columns choosen
+
+
+# create sklearn random forest model 
+
+
+# fit the model with the training dataset
+
+
+# predict results using the test dataset on the random forest model
+
+
+# calculate the accuracy score 
+
+
+# import Basemap to be used for visualization
+
+
+# plot the training and test dataset based on the Latitude and Longitude and distinguish between the two groups
+
+
+# use commands from Basemap library to draw visual global map 
