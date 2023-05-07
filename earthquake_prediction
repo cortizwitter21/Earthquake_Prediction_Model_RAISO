@@ -1,4 +1,70 @@
 import numpy as np
 import pandas as pd 
-print("Hello World")
-print("Let's learn git!")
+import datetime
+import time
+
+# using pandas library read dataset and print out head and columns of dataset  
+earthquake_data = pd.read_csv('shortened_earthquake_data.csv')
+print("Database: " , earthquake_data.head)
+print("Columns: " , earthquake_data.columns)
+
+# define the columns we want to use as earthquake data and print out head of data set
+earthquake_data = earthquake_data[['date', 'hour', 'latitude', 'longitude', 'depth', 'mag']]
+print("Cut Database: ", earthquake_data.head)
+
+# calculate timestamp (# of seconds to time now) by combining and iterating through the date 
+# and time cols of dataset, type setting hour to a string, and calculating the datetime of 
+# the combined date and time which is a string in the format Month/day/year hour:minute:second
+# using this found datetime then calculate timestamp and add the timestamp into the timestamp array
+timestamp = []
+for d, h in zip(earthquake_data['date'], earthquake_data['hour']):
+    try:
+        h = str(h) + ':00:00'
+        ts = datetime.datetime.strptime(d+' '+h, '%m/%d/%Y %H:%M:%S')
+        timestamp.append(time.mktime(ts.timetuple()))
+    except ValueError:
+        timestamp.append('ValueError')
+
+# use function pd.Series to create a 1D array capable of storing various data types
+# create a new col for earthquake_data titled timestamp to store the values of the 1D array created 
+timeStamp = pd.Series(timestamp)
+earthquake_data['timestamp'] = timeStamp.values 
+
+# get rid of all rows where timestamp = ValueError 
+earthquake_data = earthquake_data[earthquake_data.timestamp != 'ValueError']
+
+# final data set 
+earthquake_data = earthquake_data[['timestamp', 'latitude', 'longitude', 'depth', 'mag']]
+
+print("Final Database: " , earthquake_data.head)
+print("Final Columns: " , earthquake_data.columns)
+
+# set an X and Y variable based on the dataset columns choosen
+X = earthquake_data[['latitude','longitude', 'timestamp']]
+y = earthquake_data[['depth','mag']]
+
+# using sklearn model train test split the dataset
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2)
+
+# CHANGE CODE FROM HERE DOWN TO CHECK ACCURACY OF DIFFERENT ML MODELS:
+
+# create sklearn random forest model 
+from sklearn.ensemble import RandomForestRegressor
+randomForest = RandomForestRegressor()
+
+# fit the model with the training dataset
+randomForest.fit(X_train, y_train)
+
+# predict results using the test dataset on the random forest model
+y_pred = randomForest.predict(X_test)
+
+# y_pred reformatted for readability
+prediction = pd.DataFrame({
+    'depth': y_pred[:,0], 
+    'mag': y_pred[:,1],
+})
+print("Prediction: ", prediction)
+
+# calculate the accuracy score and print
+print("Accurary: ", randomForest.score(X_test, y_test))
